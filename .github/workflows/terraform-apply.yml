@@ -1,0 +1,60 @@
+name: terraform-apply
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "envs/**"
+      - "modules/**"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to apply"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  apply:
+    name: Terraform apply
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/github-terraform-apply-${{ env.ENVIRONMENT }}-role
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.2
+
+      - name: Terraform init
+        run: terraform -chdir=envs/${ENVIRONMENT} init "-backend-config=backend.hcl"
+
+      - name: Terraform validate
+        run: terraform -chdir=envs/${ENVIRONMENT} validate
+
+      - name: Terraform plan
+        run: terraform -chdir=envs/${ENVIRONMENT} plan -out=tfplan
+
+      - name: Terraform apply
+        run: terraform -chdir=envs/${ENVIRONMENT} apply -auto-approve tfplan
