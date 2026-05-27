@@ -33,7 +33,7 @@ terraform apply tfplan
 
 ## Cost note
 
-`enable_eks` is enabled in `dev` because Step 3 is meant to stand up the cloud platform foundation. EKS, NAT Gateway, and later OpenSearch Serverless/Bedrock can create real AWS cost. Destroy when not practicing:
+`enable_eks` is enabled in `dev` because Step 3 is meant to stand up the cloud platform foundation. The default EKS version is `1.35`, which is in standard support as of May 2026. EKS, NAT Gateway, and later OpenSearch Serverless/Bedrock can create real AWS cost. Destroy when not practicing:
 
 ```powershell
 terraform destroy
