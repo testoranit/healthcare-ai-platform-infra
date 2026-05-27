@@ -1,9 +1,38 @@
+# Terraform local working directories
 .terraform/
+
+# Terraform state and plans
 *.tfstate
 *.tfstate.*
 tfplan
 *.tfplan
+*.plan
+
+# Terraform crash/debug logs
 crash.log
 crash.*.log
+
+# Local variable files may contain account-specific or sensitive values
 *.auto.tfvars
+*.auto.tfvars.json
+terraform.tfvars.json
 !example.auto.tfvars
+
+# Keep provider lock files tracked for reproducible CI
+!.terraform.lock.hcl
+
+# Tool caches and reports
+.tflint.d/
+.terraform-docs.yml
+checkov-report.*
+terrascan-report.*
+
+# Local env and OS/editor files
+.env
+.env.*
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
